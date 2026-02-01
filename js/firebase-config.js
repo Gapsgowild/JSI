@@ -11,8 +11,8 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Get references
-const db = firebase.firestore();
-const auth = firebase.auth();
+// Get references - removed to avoid redeclaration conflicts
+// const db = firebase.firestore();
+// const auth = firebase.auth();
 
 console.log("[v0] Firebase initialized successfully");

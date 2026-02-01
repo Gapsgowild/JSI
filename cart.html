@@ -4,8 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bloom & Petals - Fresh Flowers Delivered</title>
+    <title>Your Shopping Cart - Bloom & Petals</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .cart-page-section {
+            padding: 4rem 2rem;
+            min-height: 60vh;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .cart-container {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .cart-page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+
+        .cart-page-header h1 {
+            color: var(--primary);
+            font-size: 2rem;
+        }
+    </style>
 </head>
 
 <body>
@@ -13,9 +43,9 @@
     <nav class="navbar">
         <div class="container">
             <div class="nav-content">
-                <div class="logo">🌸 Bloom & Petals</div>
+                <a href="index.html" class="logo">🌸 Bloom & Petals</a>
                 <ul class="nav-links">
-                    <li><a href="#products" class="nav-link">Shop</a></li>
+                    <li><a href="index.html" class="nav-link">Shop</a></li>
                     <li><a href="history.html" class="nav-link">History</a></li>
                 </ul>
                 <div style="display: flex; align-items: center; gap: 1rem; margin-right: 1rem;">
@@ -30,33 +60,40 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Fresh Flowers for Every Occasion</h1>
-            <p>Handpicked blooms delivered straight to your door</p>
-            <button class="btn btn-primary"
-                onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})">
-                Shop Now
-            </button>
-        </div>
-    </section>
+    <!-- Cart Page Content -->
+    <section class="cart-page-section">
+        <div class="cart-container">
+            <div class="cart-page-header">
+                <h1>Shopping Cart</h1>
+                <a href="index.html" class="btn btn-secondary btn-small">Continue Shopping</a>
+            </div>
 
-    <!-- Products Section -->
-    <section id="products" class="products-section">
-        <div class="container">
-            <h2 class="section-title">Our Collections</h2>
-            <div class="products-grid" id="productsGrid">
-                <!-- Products loaded here -->
+            <div class="cart-items" id="cartItems">
+                <!-- Cart items loaded here -->
+            </div>
+
+            <div class="cart-summary" style="background: var(--surface-light); padding: 1.5rem; border-radius: 8px;">
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">$0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Delivery:</span>
+                    <span id="delivery">$0.00</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total:</span>
+                    <span id="total">$0.00</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem; text-align: right;">
+                <button class="btn btn-primary" id="checkoutBtn">Proceed to Checkout</button>
             </div>
         </div>
     </section>
 
-
-
-    <!-- Cart Modal Removed - using cart.html -->
-
-    <!-- Checkout Modal -->
+    <!-- Checkout Modal (Reused) -->
     <div id="checkoutModal" class="modal">
         <div class="modal-content modal-lg">
             <span class="close" id="closeCheckoutModal">&times;</span>
@@ -101,7 +138,7 @@
         </div>
     </div>
 
-    <!-- Product Detail Modal -->
+    <!-- Product Modal (Needed if we want to view details from cart, though currently not linked) -->
     <div id="productModal" class="modal">
         <div class="modal-content modal-lg">
             <span class="close" id="closeProductModal">&times;</span>

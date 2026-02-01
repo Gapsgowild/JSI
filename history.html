@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History - Bloom & Petals</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .history-section {
+            padding: 4rem 2rem;
+            min-height: 60vh;
+        }
+
+        .order-card {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .order-id {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .order-date {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .order-items {
+            margin-bottom: 1.5rem;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .order-total {
+            text-align: right;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .no-orders {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">🌸 Bloom & Petals</a>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="nav-link">Shop</a></li>
+                    <li><a href="#" class="nav-link active">Order History</a></li>
+                </ul>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-right: 1rem;">
+                    <span id="userEmail" style="font-weight: 500; color: #2d5f4f;"></span>
+                    <a href="login.html" class="nav-link" id="authBtn">Login</a>
+                </div>
+                <!-- Cart Button Hidden on History Page or kept for consistency? Kept for consistency -->
+                <button class="cart-btn" id="cartBtn" onclick="window.location.href='cart.html'">
+                    <span class="cart-icon">🛒</span>
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- History Section -->
+    <section class="history-section">
+        <div class="container">
+            <h2 class="section-title">Your Order History</h2>
+            <div id="ordersContainer">
+                <div class="loading" style="display: block; text-align: center;">Loading orders...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Modal Removed - using cart.html -->
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/history.js"></script>
+</body>
+
+</html>

@@ -1,5 +1,5 @@
 // Global State
-let cart = [];
+// Cart is now managed in cart.js
 let currentUser = null;
 let products = [];
 let currentProduct = null;
@@ -10,20 +10,17 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 // Modal References
-const cartModal = document.getElementById('cartModal');
 const checkoutModal = document.getElementById('checkoutModal');
 const productModal = document.getElementById('productModal');
 const authModal = document.getElementById('authModal'); // Declare authModal
 
-const closeCartModal = document.getElementById('closeCartModal');
 const closeCheckoutModal = document.getElementById('closeCheckoutModal');
 const closeProductModal = document.getElementById('closeProductModal');
 const closeAuthModal = document.getElementById('closeAuthModal'); // Declare closeAuthModal
 
 // Button References
 const authBtn = document.getElementById('authBtn');
-const cartBtn = document.getElementById('cartBtn');
-const checkoutBtn = document.getElementById('checkoutBtn');
+// checkoutBtn is declared in cart.js
 const addToCartBtn = document.getElementById('addToCartBtn');
 const checkoutForm = document.getElementById('checkoutForm');
 
@@ -32,31 +29,29 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('[v0] Initializing app');
     setupEventListeners();
     loadProducts();
-    loadCart();
     checkAuthStatus();
 });
 
 // Event Listeners Setup
 function setupEventListeners() {
-    // Cart
-    cartBtn.addEventListener('click', openCartModal);
-    closeCartModal.addEventListener('click', () => closeModal(cartModal));
-    checkoutBtn.addEventListener('click', openCheckoutModal);
-    closeCheckoutModal.addEventListener('click', () => closeModal(checkoutModal));
-    
+    // Checkout
+    if (checkoutBtn) checkoutBtn.addEventListener('click', openCheckoutModal);
+    if (closeCheckoutModal) closeCheckoutModal.addEventListener('click', () => closeModal(checkoutModal));
+
     // Product Modal
-    closeProductModal.addEventListener('click', () => closeModal(productModal));
-    
+    if (closeProductModal) closeProductModal.addEventListener('click', () => closeModal(productModal));
+
     // Checkout Form
-    checkoutForm.addEventListener('submit', handleCheckout);
-    
+    if (checkoutForm) checkoutForm.addEventListener('submit', handleCheckout);
+
     // Quantity Selector
-    document.getElementById('decreaseQty').addEventListener('click', decreaseQuantity);
-    document.getElementById('increaseQty').addEventListener('click', increaseQuantity);
-    
+    const decreaseQtyBtn = document.getElementById('decreaseQty');
+    const increaseQtyBtn = document.getElementById('increaseQty');
+    if (decreaseQtyBtn) decreaseQtyBtn.addEventListener('click', decreaseQuantity);
+    if (increaseQtyBtn) increaseQtyBtn.addEventListener('click', increaseQuantity);
+
     // Close modals when clicking outside
     window.addEventListener('click', (e) => {
-        if (e.target === cartModal) closeModal(cartModal);
         if (e.target === checkoutModal) closeModal(checkoutModal);
         if (e.target === productModal) closeModal(productModal);
     });
@@ -72,6 +67,8 @@ function checkAuthStatus() {
 }
 
 function updateAuthButton() {
+    const userEmailElement = document.getElementById('userEmail');
+
     if (currentUser) {
         authBtn.textContent = `Logout`;
         authBtn.href = '#';
@@ -79,10 +76,12 @@ function updateAuthButton() {
             e.preventDefault();
             logout();
         };
+        if (userEmailElement) userEmailElement.textContent = currentUser.email;
     } else {
         authBtn.textContent = 'Login';
         authBtn.href = 'login.html';
         authBtn.onclick = null;
+        if (userEmailElement) userEmailElement.textContent = '';
     }
 }
 
@@ -101,10 +100,10 @@ async function logout() {
 async function loadProducts() {
     try {
         console.log('[v0] Loading products from Firestore');
-        
+
         // Try to get products from Firestore
         const snapshot = await db.collection('products').get();
-        
+
         if (snapshot.empty) {
             console.log('[v0] No products in Firestore, using sample data');
             // Use sample products if collection is empty
@@ -175,7 +174,7 @@ function loadSampleProducts() {
             rating: 4.8
         }
     ];
-    
+
     products = sampleProducts;
     renderProducts();
 }
@@ -183,7 +182,7 @@ function loadSampleProducts() {
 function renderProducts() {
     const productsGrid = document.getElementById('productsGrid');
     productsGrid.innerHTML = '';
-    
+
     products.forEach(product => {
         const productCard = document.createElement('div');
         productCard.className = 'product-card';
@@ -207,13 +206,17 @@ function renderProducts() {
 function openProductDetail(productId) {
     currentProduct = products.find(p => p.id === productId);
     if (!currentProduct) return;
-    
-    document.getElementById('productImage').textContent = currentProduct.emoji || '🌸';
+
+    // Updated to handle both emoji (text) and potential image URLs if added later
+    const productImageElement = document.getElementById('productImage');
+    productImageElement.textContent = currentProduct.emoji || '🌸';
+    // If we were supporting real images, we would check for image URL and set background-image or innerHTML img
+
     document.getElementById('productTitle').textContent = currentProduct.name;
     document.getElementById('productDescription').textContent = currentProduct.description;
     document.getElementById('productPrice').textContent = `$${currentProduct.price.toFixed(2)}`;
     document.getElementById('quantity').value = 1;
-    
+
     openModal(productModal);
     console.log('[v0] Opened product detail:', currentProduct.name);
 }
@@ -232,7 +235,7 @@ function decreaseQuantity() {
 
 function handleAddToCart() {
     if (!currentProduct) return;
-    
+
     const quantity = parseInt(document.getElementById('quantity').value);
     addToCart(currentProduct, quantity);
     closeModal(productModal);
@@ -240,94 +243,8 @@ function handleAddToCart() {
 
 addToCartBtn.addEventListener('click', handleAddToCart);
 
-// Cart Functions
-function addToCart(product, quantity) {
-    const existingItem = cart.find(item => item.id === product.id);
-    
-    if (existingItem) {
-        existingItem.quantity += quantity;
-    } else {
-        cart.push({
-            ...product,
-            quantity: quantity
-        });
-    }
-    
-    saveCart();
-    updateCartCount();
-    showToast(`${product.name} added to cart!`, 'success');
-    console.log('[v0] Added to cart:', product.name, 'qty:', quantity);
-}
+// Cart functions have been moved to cart.js
 
-function removeFromCart(productId) {
-    cart = cart.filter(item => item.id !== productId);
-    saveCart();
-    updateCartCount();
-    renderCartItems();
-    showToast('Item removed from cart', 'success');
-    console.log('[v0] Removed from cart:', productId);
-}
-
-function saveCart() {
-    localStorage.setItem('cart', JSON.stringify(cart));
-}
-
-function loadCart() {
-    const saved = localStorage.getItem('cart');
-    if (saved) {
-        cart = JSON.parse(saved);
-        updateCartCount();
-        console.log('[v0] Cart loaded from localStorage');
-    }
-}
-
-function updateCartCount() {
-    document.getElementById('cartCount').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
-}
-
-function openCartModal() {
-    renderCartItems();
-    openModal(cartModal);
-}
-
-function renderCartItems() {
-    const cartItems = document.getElementById('cartItems');
-    
-    if (cart.length === 0) {
-        cartItems.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🛒</div><p>Your cart is empty</p></div>';
-        document.getElementById('checkoutBtn').disabled = true;
-        return;
-    }
-    
-    document.getElementById('checkoutBtn').disabled = false;
-    cartItems.innerHTML = '';
-    
-    let subtotal = 0;
-    cart.forEach(item => {
-        const itemTotal = item.price * item.quantity;
-        subtotal += itemTotal;
-        
-        const cartItem = document.createElement('div');
-        cartItem.className = 'cart-item';
-        cartItem.innerHTML = `
-            <div class="cart-item-image">${item.emoji || '🌸'}</div>
-            <div class="cart-item-details">
-                <div class="cart-item-title">${item.name}</div>
-                <div class="cart-item-price">$${item.price.toFixed(2)} x ${item.quantity}</div>
-                <div class="cart-item-price" style="font-weight: bold; color: var(--primary);">Total: $${itemTotal.toFixed(2)}</div>
-            </div>
-            <button class="cart-item-remove" onclick="removeFromCart('${item.id}')">✕</button>
-        `;
-        cartItems.appendChild(cartItem);
-    });
-    
-    const delivery = cart.length > 0 ? 9.99 : 0;
-    const total = subtotal + delivery;
-    
-    document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
-    document.getElementById('delivery').textContent = `$${delivery.toFixed(2)}`;
-    document.getElementById('total').textContent = `$${total.toFixed(2)}`;
-}
 
 // Checkout Functions
 function openCheckoutModal() {
@@ -336,7 +253,7 @@ function openCheckoutModal() {
         window.location.href = 'login.html';
         return;
     }
-    
+
     // Pre-fill email
     document.getElementById('email').value = currentUser.email;
     openModal(checkoutModal);
@@ -345,17 +262,17 @@ function openCheckoutModal() {
 
 async function handleCheckout(e) {
     e.preventDefault();
-    
+
     if (!currentUser) {
         showToast('Please login first', 'error');
         return;
     }
-    
+
     if (cart.length === 0) {
         showToast('Your cart is empty', 'error');
         return;
     }
-    
+
     const fullName = document.getElementById('fullName').value;
     const email = document.getElementById('email').value;
     const address = document.getElementById('address').value;
@@ -364,19 +281,19 @@ async function handleCheckout(e) {
     const zip = document.getElementById('zip').value;
     const deliveryDate = document.getElementById('deliveryDate').value;
     const instructions = document.getElementById('instructions').value;
-    
+
     if (!fullName || !address || !city || !state || !zip || !deliveryDate) {
         showToast('Please fill in all required fields', 'error');
         return;
     }
-    
+
     try {
         console.log('[v0] Creating order');
-        
+
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const delivery = 9.99;
         const total = subtotal + delivery;
-        
+
         const order = {
             userId: currentUser.uid,
             email: email,
@@ -399,22 +316,22 @@ async function handleCheckout(e) {
             createdAt: new Date(),
             status: 'pending'
         };
-        
+
         const docRef = await db.collection('orders').add(order);
         console.log('[v0] Order created with ID:', docRef.id);
-        
+
         // Clear cart
         cart = [];
         saveCart();
         updateCartCount();
-        
+
         // Show success message
         showToast('Order placed successfully! Order ID: ' + docRef.id, 'success');
-        
+
         // Close modals and reset form
         closeModal(checkoutModal);
         checkoutForm.reset();
-        
+
         console.log('[v0] Order completed:', docRef.id);
     } catch (error) {
         showToast('Error placing order: ' + error.message, 'error');
@@ -440,7 +357,7 @@ function showToast(message, type = 'success') {
     const toast = document.getElementById('toast');
     toast.textContent = message;
     toast.className = `toast show ${type}`;
-    
+
     setTimeout(() => {
         toast.classList.remove('show');
     }, 3000);
